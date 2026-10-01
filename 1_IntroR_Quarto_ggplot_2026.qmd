@@ -463,7 +463,9 @@ VisBoxplot
 Q1: Make a line graph that depicts the number of visitors per year for only Yosemite and Joshua Tree National Parks. Use color and line type to distinguish the two parks.
 
 ```{r}
-
+ggplot(VisitorGraph) +
+  aes(x = Code, y = kVis, fill = ) +
+  geom_line()
 ```
 
 Q2: Make a boxplot that compares visitation rates in all parks in 1980 to present.
@@ -475,5 +477,7 @@ Q2: Make a boxplot that compares visitation rates in all parks in 1980 to presen
 Q3: Make a plot using the data of your choosing to show something interesting about either the candy_rankings data or the np_visits data.
 
 ```{r}
-
+ggplot(candy_rankings)
+  aes(x = competitorname, y = winpercent) +
+  geom_point()
 ```
