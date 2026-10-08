@@ -45,6 +45,8 @@ summary() : min, 1st quartile, median, mean, 3rd quartile, max
 load(file = "Demo Data Files/CCdata_tidy.Rdata")
 install.packages("car")
 library(tidyverse)
+
+view(CCdata_tidy)
 ```
 
 ### Example using summarize to make a nice summary table of some old owl limpet data:
@@ -83,10 +85,13 @@ geom_col() +
 Boiling it down to the mean and standard deviation really loses a lot of information though. It's always good to look at the histogram/distribution to get a better sense of what's going on. Let's look back at just that one histogram.
 
 ```{r}
-CC_sp19 <-
-  filter(Season ==  Year == Impact == )
+CC_sp19 <- CCdata_tidy |> 
+  filter(Season == "Spring" & Year == 2019 & Impact == "High" )
 
 CC_sp19 %>%
+  ggplot() +
+  aes(x = Size) +
+  geom_histogram(aes(y= ..density..))
   
 ```
 
@@ -111,11 +116,14 @@ What observations can we make about the distribution of this data?
 - What factors apart from the population itself may have influenced this pattern? Let's look at the histograms for all the dates and sites:
 
 ```{r many histograms}
-CCdata_tidy %>%
+CCdata_tidy |> 
   ggplot() +
+  aes (x =Size) +
+  geom_histogram() +
+  facet_wrap(Survey_Date ~ Impact)
   
 
-
+ 
 ```
 
 On the whole, how would you describe these distributions?
@@ -137,11 +145,14 @@ How do we assess?
 Visual:
 
 ```{r}
-CC_sp19 <-  %>%
-  filter()
+CC_sp19 <- CCdata_tidy |> 
+  filter(Season == "Spring" & Year == 2019 & Impact == "High" )
+
 
 CC_sp19 %>%
   ggplot() +
+  aes( x = Size) +
+  geom_histogram(aes(y = after_stat(density)))
   
 ```
 
@@ -149,7 +160,7 @@ CC_sp19 %>%
 
 ```{r}
 # here's one function from Base R
-qqnorm()
+qqnorm(CC_sp19)
 
 # And another from the car package that has 95% confidence intervals
 car::qqPlot()
