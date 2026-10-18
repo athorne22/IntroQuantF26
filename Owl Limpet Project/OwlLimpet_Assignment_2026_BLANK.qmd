@@ -194,10 +194,13 @@ Do you see any patterns just from examining this table of values?
 What was the mean limpets per square meter across all sites? And the standard deviation? And standard error?
 
 ```{r}
-Limpet_Density |>
-  mean
-  
-
+Limpet_Density <- No_CDM_Sizes |>
+  group_by(site, year, transect_num, transect_length_m) |>
+  count(site) |>
+  mutate(density = (n/(transect_length_m*2)))
+  mean(Limpet_Density$density, na.rm = TRUE)
+  sd(Limpet_Density$density, na.rm = TRUE)
+  sd(Limpet_Density$density, na.rm = TRUE)/sqrt(1746)
 ```
 
 Now create a summary table in which you calculate separate mean and standard deviation for each site and year (Shaws vs. Heisler vs. Treasure Cove)? What was the standard error? Round the mean and standard error to one decimal place. (look up the `round()` function!)
@@ -205,7 +208,13 @@ Now create a summary table in which you calculate separate mean and standard dev
 ```{r}
 # use summarize() to calculate the mean and standard error (sd/sqrt(n)) for the two locations
 LimpetPopSummary <- Limpet_Density |>
-  
+  group_by(site, year) |>
+  summarize(mean_density = mean(density, na.rm = TRUE), # mean 
+            sd_density= sd(density, na.rm = TRUE),  # standard deviation
+            n = n(), # count
+            se_density = sd_density/sqrt(n)) |> # standard error
+  mutate_at(vars(mean_density, sd_density, se_density), # bonus line to reduce digits
+            .funs = round, 2)
   
   
   
@@ -219,7 +228,9 @@ knitr::kable(LimpetPopSummary)
 Boxplot, using the `Limpet_density` object, using fill for year. Label the Y-axis to say "Limpets per square meter".
 
 ```{r}
-Limpet_Density |> ggplot() + 
+Limpet_Density |> ggplot() +
+  aes( x = mean_density) +
+  geom_boxplot(aes(fill = year))
  
   
 ```
