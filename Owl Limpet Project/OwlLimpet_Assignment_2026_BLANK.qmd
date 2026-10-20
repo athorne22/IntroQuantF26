@@ -1,12 +1,12 @@
----
+------------------------------------------------------------------------
 
- ---
-title: "Owl Limpet Analysis BLANK"
-author: "Dr. Amy King-Henry"
-last modified: "October 4, 2026"
-format: html
-editor: visual
----
+|                                   |
+|-----------------------------------|
+| itle: "Owl Limpet Analysis BLANK" |
+| uthor: "Dr. Amy King-Henry"       |
+| ast modified: "October 4, 2026"   |
+| ormat: html                       |
+| ditor: visual                     |
 
 # Assessment of owl limpet (*Lottia gigantea*) populations at sites within Crystal Cove State Marine Conservation Area
 
@@ -21,13 +21,13 @@ library(readxl)
 
 You have been given data from several locations and survey years:
 
--   2022: Corona del Mar (CDM) - size data only, taken haphazardly
+- 2022: Corona del Mar (CDM) - size data only, taken haphazardly
 
--   2023: Treasure Cove (TC) - size data in 5-m transects, territories
+- 2023: Treasure Cove (TC) - size data in 5-m transects, territories
 
--   2024: Heisler Park and Shaws Cove - size data in variable length transects, territories
+- 2024: Heisler Park and Shaws Cove - size data in variable length transects, territories
 
--   2025: Treasure Cove (TC) - size data in 5-m transects, territories
+- 2025: Treasure Cove (TC) - size data in 5-m transects, territories
 
 ```{r}
 load(file = "Data/SizeData_2022_2025.Rdata")
@@ -89,11 +89,11 @@ TransectLengths
 
 Visualize the transect lengths two different ways.
 
--   Make one boxplot with transect length on the y-axis, and site on the x-axis.
+- Make one boxplot with transect length on the y-axis, and site on the x-axis.
 
--   Use `geom_point()` to make a scatter plot with the same axes.
+- Use `geom_point()` to make a scatter plot with the same axes.
 
--   combine the two so that the points are red and overlay the boxplot graph.
+- combine the two so that the points are red and overlay the boxplot graph.
 
 ```{r}
 TransectLengths |> ggplot() +
@@ -270,15 +270,15 @@ Based on these plots, does your data meet assumptions for a t-test?
 
 T-Test assumptions (for a Student's T-test)
 
--   Are the data continuous (i.e., not categorical/discrete)?
+- Are the data continuous (i.e., not categorical/discrete)?
 
-    -   Density is continuous
+  - Density is continuous
 
--   Have the sample data been randomly sampled from a population?
+- Have the sample data been randomly sampled from a population?
 
--   Is there homogeneity of variance (i.e., the variability of the data in each group is similar)?
+- Is there homogeneity of variance (i.e., the variability of the data in each group is similar)?
 
--   Is the distribution of the model residuals approximately normal?
+- Is the distribution of the model residuals approximately normal?
 
 #### 2.5 What is the sample size (of transects) for each site/year for our study of limpet population density?
 
@@ -371,11 +371,11 @@ We have a much larger sample size for shell lengths than we did for density, so 
 
 T-Test assumptions (for a Student's T-test)
 
--   Are the data continuous (i.e., not categorical/discrete)? **YES**
+- Are the data continuous (i.e., not categorical/discrete)? **YES**
 
--   Have the sample data been randomly sampled from a population? **(Yes)**
+- Have the sample data been randomly sampled from a population? **(Yes)**
 
--   Is there homogeneity of variance (i.e., the variability of the data in each group is similar)? **NO**
+- Is there homogeneity of variance (i.e., the variability of the data in each group is similar)? **NO**
 
 ```{r}
 ## Test for Homogeneity of Variance with an F-Test
@@ -401,7 +401,7 @@ var.test(shell_length_mm ~ site, data = CDM_TC_Sizes)
 
 ```
 
--   Is the distribution of the model residuals approximately normal?
+- Is the distribution of the model residuals approximately normal?
 
 ```{r}
 ## Test for normality
@@ -492,9 +492,9 @@ All_Territories |>
 
 Create new columns for:
 
--   territory area in square millimeters from the "`numbsquares`" column
+- territory area in square millimeters from the "`numbsquares`" column
 
--   Limpet body mass from shell length (equation below is from Fenberg et al. 2013).
+- Limpet body mass from shell length (equation below is from Fenberg et al. 2013).
 
 ```{r}
 All_Territories_area_mass <- All_Territories |> 
