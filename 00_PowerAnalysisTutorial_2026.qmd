@@ -103,9 +103,10 @@ tight <- tibble(sort(var1), sort(var3))
 loose <- ggplot(tight, aes(var1,var3)) + geom_point() + geom_smooth(method = "lm") + labs(x = "", y = "")
 tightlm <- ggplot(tight, aes(`sort(var1)`,`sort(var3)`)) + geom_point() + geom_smooth(method = "lm") + labs(x = "", y = "")
 
+install.packages("patchwork")
 library(patchwork)
 
-(small | large) / (loose | tightlm)
+(small | large) / (loose | tightlm)l
 ```
 
 #### Intuiting Effect Size
@@ -121,6 +122,8 @@ Consider the two scenarios:
 - You need to know if the new herbicide is safe for the native plants you are trying to conserve, and find that it kills 5% more of the endangered native plants than the one that you were using before (p \< 0.05).
 
   - How much more lethal does it need to be before you get concerned?
+
+    **practical importance**
 
 In the first scenario, a small effect size was hardly worth mentioning, but in the other, you take notice because the stakes are higher. Notice how the statistical significance (the p-value) had nothing to do with how [practically important]{.underline} the results were.
 
@@ -153,6 +156,7 @@ However, larger sample sizes in ecological experiments can be a lot of work, spa
 
 ```{r}
 # sample size at each location within TC
+install.packages("janitor")
 location_n_TC <- All_Size_Data |>
   group_by(site) |>
   count() |>
@@ -234,6 +238,8 @@ temp2 <- temp |>
 temp2
 ```
 
+**NS is also a type II error test**
+
 Is a smaller sample more likely to pass the normality test? Does this change how we think about tests of normality for data sets with large sample sizes?
 
 ```{r}
@@ -249,7 +255,7 @@ subsample_model <- lm(shell_length_mm ~ site, Subsample)
 
 plot(subsample_model, which = 2)
 
-shapiro.test(subsample_model$residuals)
+shapiro.test(subsample_model$residuals) # not sig. different from normal
 ```
 
 ### Power
@@ -346,7 +352,7 @@ What was the **power** of our full-scale owl limpet study for the difference bet
 
 ```{r}
 pwr.t.test(
-  n = nrow(All_Size_Data),
+  n = 187,
   d = 0.9599906,
   sig.level = 0.05,
   power = NULL,
