@@ -7,12 +7,12 @@ editor: visual
 ---
 
 ```{r}
-install.packages()
+install.packages("pwr")
 
 library(pwr)
 library(tidyverse)
 
-load(file = )
+load(file = "Demo Data Files/CleanOwlLimpet_Data2023.Rdata")
 ```
 
 ## 1. The Setting: Owl Limpet T-test
@@ -20,12 +20,13 @@ load(file = )
 So in our Owl Limpet Analysis assignment, we ran a t-test and found that there was a [highly]{.underline} significant difference (p \< 0.0000000000000001, *LOL*) in limpet shell size between Corona del Mar and Treasure Cove.
 
 ```{r}
-t.test()
+t.test(CDM_Data2022$shell_length_mm, TC_Data2023$shell_length_mm)
 ```
 
 ```{r}
-ggplot() + 
-  aes(x = , color = ) + 
+ggplot(All_Size_Data) + 
+  aes(x = shell_length_mm, color = site ) + 
+  geom_density()
   
 ```
 
@@ -85,23 +86,23 @@ We can intuit from this equation how certain quantities will change with each ot
 Effect size is a quantitative measure of the magnitude of the experimental effect. The larger the effect size the stronger the relationship between two variables. For a test of difference, this can be a larger difference between means. For a correlation or regression, this can be how "tight" the relationship is.
 
 ```{r}
-var1 <- rnorm(, mean = , sd = )
-var2 <- rnorm()
-var3 <- 
-large <- c()
-small <- c()
+var1 <- rnorm(10, mean = 12, sd = 1)
+var2 <- rnorm(10, mean = 5, sd = 1)
+var3 <- rnorm(10, mean = 11, sd = 1)
+large <- c(var1,var2)
+small <- c(var1,var3)
 
-names <- c()
-diff_large <- tibble()
-diff_small <- 
+names <- c(rep("var1", 10), rep("var2", 10))
+diff_large <- tibble(names, large)
+diff_small <- tibble(names, small)
 
-large <- ggplot(, aes()) + geom_boxplot() + labs(title = , x =, y = )
-small <- ggplot()
+large <- ggplot(diff_large, aes(names,large)) + geom_boxplot() + labs(title = "large effect size", x = "", y = "")
+small <- ggplot(diff_small, aes(names,small)) + geom_boxplot() + labs(title = "small effect size", x = "", y = "")
 
-tight <- tibble()
+tight <- tibble(sort(var1), sort(var3))
 
-loose <- ggplot()
-tightlm <- ggplot()
+loose <- ggplot(tight, aes(var1,var3)) + geom_point() + geom_smooth(method = "lm") + labs(x = "", y = "")
+tightlm <- ggplot(tight, aes(`sort(var1)`,`sort(var3)`)) + geom_point() + geom_smooth(method = "lm") + labs(x = "", y = "")
 
 library(patchwork)
 

@@ -26,13 +26,13 @@ Today we will play with a few datasets that fit these criteria.
 ### Load Data
 
 ```{r}
-load()
+load(file = "Demo Data Files/S4E2e.RData") 
 ```
 
 ### Load packages
 
 ```{r}
-library()
+library(tidyverse)
 ```
 
 ## Correlation
@@ -52,8 +52,8 @@ We think there might be a relationship here!
 Let's make a scatter plot to explore this data and see if we think there might be a relationship.
 
 ```{r}
-ggplot() + 
-  aes() +
+ggplot(mayfly) + 
+  aes(x = Speed, y = Abund) +
   geom_point()
 ```
 
@@ -72,7 +72,7 @@ The assumptions of correlation are:
 ##### Are one or both of your variables **normal**? (this is a very small sample size, so we will assume its good enough, but normally you could check with a histogram)
 
 ```{r}
-hist()
+hist(mayfly$Abund)
 
 ```
 
