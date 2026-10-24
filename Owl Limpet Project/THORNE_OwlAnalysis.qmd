@@ -1,12 +1,12 @@
 ------------------------------------------------------------------------
 
-|                                   |
-|-----------------------------------|
-| itle: "Owl Limpet Analysis BLANK" |
-| uthor: "Dr. Amy King-Henry"       |
-| ast modified: "October 4, 2026"   |
-| ormat: html                       |
-| ditor: visual                     |
+|                                 |
+|---------------------------------|
+| Title: THORNE Owl Analysis      |
+| Author: Alexandra Thorne        |
+| Last modified: October 23, 2026 |
+| Format: html                    |
+| Editor: visual                  |
 
 # Assessment of owl limpet (*Lottia gigantea*) populations at sites within Crystal Cove State Marine Conservation Area
 
