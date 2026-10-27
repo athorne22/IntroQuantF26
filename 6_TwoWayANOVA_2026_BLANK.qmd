@@ -6,8 +6,7 @@ format: html
 editor: visual
 ---
 
-```{r setup, include=FALSE}
-knitr::
+```{}
 ```
 
 # Two-Way ANOVA Tutorial
@@ -15,8 +14,8 @@ knitr::
 **Load Packages**
 
 ```{r cars}
-install.packages("")
-install.packages("")
+install.packages("ggpubr")
+install.packages("ggsignif")
 
 library(tidyverse)
 ```
@@ -24,7 +23,8 @@ library(tidyverse)
 **Load Data**
 
 ```{r}
-load(file = )
+load(file = "Demo Data Files/S4E2e.RData")
+
 ```
 
 This time let's work with a dataset that has tested TWO factors.

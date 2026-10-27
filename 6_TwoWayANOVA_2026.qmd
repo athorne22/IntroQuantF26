@@ -106,6 +106,8 @@ plot(model, which = 2)
 ggpubr::ggqqplot(residuals(model))
 ```
 
+- ***establish that residuals are normal***
+
 #### Homogeneity of variance:
 
 For multi-way ANOVA, Levene's test works pretty well.
@@ -122,6 +124,10 @@ pw %>% rstatix::levene_test(height ~ plant*water)
 
 Looks pretty okay!
 
+***symmetrical variance across clusters, even variance above and below and left to right***
+
+regression even scatter, anova more categories
+
 ### Step 5: Conduct the statistical test
 
 ```{r}
@@ -135,7 +141,7 @@ summary(model_pw_aov)
 
 At first pass, it looks like:
 
-- Plant species by itself didn't make a difference (p = 0.14264)
+- Plant species by itself didn't make a difference (p = 0.14264), **not sig. p value**,
 
 - Water treatment did make a big difference (p \<\<\< 0.0001)
 
@@ -185,7 +191,7 @@ If your degrees of freedom don't add up, you can try the following troubleshooti
 
 ### Step 7: Post-Hoc Test
 
-Like in one-way ANOVA, this test only tells us if there IS a difference between one or more groups, not which groups are different. We can again use Tukey's Honest Significant Difference test to assess our results and get those details, though its more challenging to parse this time around.
+Like in one-way ANOVA, this test only tells us if **there IS a difference between one or more groups, not which groups are differen**t. We can again use Tukey's Honest Significant Difference test to assess our results and get those details, though its more challenging to parse this time around.
 
 It will give us the pairwise differences within each treatment (ignoring the others), then if we have specified interactions, between each combination of treatments.
 
@@ -246,7 +252,7 @@ pw |>
 Finally, need to annotate for significance.
 
 ```{r}
-TukeyHSD(model_pw)
+TukeyHSD(model_pw_aov)
 ```
 
 You saw up above this was a lot to pick apart, and we don't need to put a \* or bracket over every pairwise comparison. A shortcut approach is to order the treatment combinations by means from largest to smallest. Based on the height of bars in the plot, this is:
@@ -271,7 +277,7 @@ Then you get the logic puzzle of figuring out the letters. Start left to right.
 ```{r}
 ggplot(pw_summary) + 
   aes(x = factor(water, levels = c("lo", "mid", "hi")), y = mean, fill = plant) + 
-  geom_col(position = "dodge") + 
+  geom_col(position = "dodge") +  # use factor to reorder variables on the x-axis
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), position = position_dodge(0.9), width = 0.2)+
   geom_text(
     label = c("A", "B", "C", "C", "CD", "D"), 
@@ -288,11 +294,13 @@ ggplot(pw_summary) +
   geom_col(position = "dodge") + 
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), position = position_dodge(0.9), width = 0.2)+
   geom_text(
-    label = c("A", "B", "C", "C", "CD", "D"), 
+    label = c("A", "A
+              ", "C", "C", "C", "D"), 
     position = position_dodge(0.9), 
     aes(y = mean+se, x = water), 
     vjust = -0.5, 
     size = 6) +
-  ylim(0, 50)
+  ylim(0, 50) +
+  labs( x = "Water Treatment")
   
 ```
