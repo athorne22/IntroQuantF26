@@ -203,7 +203,9 @@ Height_Data_Columns_Clean <- Height_Data_Raw |>
 nrow(Height_Data_Columns_Clean)
 glimpse(Height_Data_Columns_Clean)
 
-SPAD_Height <- full_join(SPAD_Data_Columns_Clean, Height_Data_Columns_Clean, by = "Tag_Number", relationship = "many-to-many")
+SPAD_Height <- inner_join(SPAD_Data_Columns_Clean, Height_Data_Columns_Clean)
+
+view(SPAD_Height)
 ```
 
 ## Exploratory Data Analysis
@@ -241,8 +243,8 @@ ggplot() +
   aes(x = Seedling_Ht_cm, y = Avg_Leaf_SPAD) +
   geom_point() +
   geom_smooth(method = lm, se = FALSE) +
-  facet_wrap( ~ Treatment.x)
-
+  facet_wrap( ~ Treatment)
+# not enough data
 ```
 
 ```{r}
