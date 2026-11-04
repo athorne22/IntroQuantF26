@@ -203,7 +203,7 @@ Height_Data_Columns_Clean <- Height_Data_Raw |>
 nrow(Height_Data_Columns_Clean)
 glimpse(Height_Data_Columns_Clean)
 
-SPAD_Height <- inner_join(SPAD_Data_Columns_Clean, Height_Data_Columns_Clean)
+SPAD_Height <- inner_join(SPAD_Data_Columns_Clean, Height_Data_Columns_Clean) 
 
 view(SPAD_Height)
 ```
