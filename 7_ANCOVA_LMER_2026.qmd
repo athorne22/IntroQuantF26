@@ -88,28 +88,28 @@ summary(TCModel_ANCOVA_withInt)
 
 These results mean:
 
-1.  there is a linear relationship with mass.
+1.  **there is a linear relationship with mass.**
 
-2.  there is not a difference of mean area between near vs. far
+2.  **there is not a difference of mean area between near vs. far**
 
-3.  The slope of the relationship with mass does not differ between the locations.
+3.  **The slope of the relationship with mass does not differ between the locations.**
 
 Looking at the plot, this makes sense!
 
 ```{r}
 TC_Terr2023 |>
   ggplot() + 
-  aes(x = log(mass_g), y = log(area_mm2), color = location) + 
+  aes(x = log(mass_g), y = log(area_mm2), color = location) +  # colors points by location
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE) 
 
 ```
 
-Since there was not a significant interaction, we should remove that from the model.
+**Since there was not a significant interaction, we should remove that from the model.**
 
 ```{r}
 TCModel_noInt <- lm(log(area_mm2) ~ log(mass_g) + location, data = TC_Terr2023)
-
+# coverted asterisk to plus sign, to show no interaction
 summary(TCModel_noInt)
 ```
 
@@ -120,7 +120,7 @@ Different ways of formulating the model or computing the outputs alters the way 
 ### Type I, II and III Sum of Squares and when to use them
 
 - **Type I** Sum of Squares examines the variables sequentially; the order you add them to the formula (i.e., y \~ a \* b is different from y \~ b \* a) is the order in which it partitions off the variation. The second variable gets the leftovers.
-  - Use only when your sample sizes are balanced
+  - **Use only when your sample sizes are balanced**
 
 ```{r}
         # how to get results of Type I SS
@@ -128,11 +128,11 @@ Different ways of formulating the model or computing the outputs alters the way 
 ```
 
 - **Type II** Sum of Squares adjusts variable for main effects, but not for interactions.
-  - Use this output if your interaction is not significant.
+  - **Use this output if your interaction is not significant.**
 
 ```{r}
         # how to get results of Type II SS
-        car::Anova(TCModel_ANCOVA_withInt, type = "II")
+        car::Anova(TCModel_noInt, type = "II")
 ```
 
 - **Type III** Sum of Squares gives you the result of when each variable is adjusted for the effect of all other variables; the main effects will be adjusted if there is an interaction specified.
@@ -159,10 +159,10 @@ The Akaike Information Criterion (AIC) is a valuable tool for comparing models f
 Which of the model formulations that we tried above is the best fit model?
 
 ```{r}
-AIC(TCModel_linear, TCModel_massANOVA, TCModel_areaANOVA, TCModel_ANCOVA_withInt, TCModel_noInt) |> kableExtra::kable()
+AIC(TCModel_massANOVA, TCModel_areaANOVA, TCModel_ANCOVA_withInt, TCModel_noInt) |> kableExtra::kable()
 ```
 
-Our best model has the lowest AIC score.
+Our best model has the lowest AIC score. **TCModel_noInt 92.4**
 
 ```{r}
 summary(TCModel_noInt)
@@ -208,6 +208,7 @@ If our sites are just replicates, and they could be interchangeable with any old
 
 ```{r}
 AllSiteModel_site_random <- lmer(log(area_mm2) ~ log(mass_g) + (1|site), data = All_Terr_Data)
+                                # specifically indicating site is a random effect 
 summary(AllSiteModel_site_random)
 ```
 
@@ -220,7 +221,7 @@ AllSiteModel_LocInt_randSite <- lmer(log(area_mm2) ~ log(mass_g) * location + (1
 summary(AllSiteModel_LocInt_randSite)
 ```
 
-The interaction is significant, so we'll drop it for a better model:
+The interaction is not significant, so we'll drop it for a better model:
 
 ```{r}
 AllSiteModel_LocnoInt_rSite <- lmer(log(area_mm2) ~ log(mass_g) + location + (1|site), data = All_Terr_Data)
@@ -256,7 +257,7 @@ AllSiteModel_randRep <- lmer(log(area_mm2) ~ log(mass_g) + (1|site) + (1|locatio
 
 ```
 
-`AllSiteModel_randNest` is the more accurate model here, since the far and near at each site do have something in common with each other - distance from the access point/impact.
+`AllSiteModel_randRep` is the more accurate model here, since the far and near at each site do have something in common with each other - distance from the access point/impact.
 
 That means our best model is probably `AllSiteModel_LocnoInt_rSite` - where we had location as a fixed effect only and a random effect of site. Let's use AIC to confirm by calculating AIC scores for all the models that reflect the relationship we want to test for (that is, excluding the two `lmer` models with random effects of location).
 
@@ -275,8 +276,8 @@ cAIC(AllSiteModel_LocInt_randSite)$caic,
 cAIC(AllSiteModel_LocnoInt_rSite)$caic)
 
 
-summary(AllSiteModel_ANCOVA_noInt)
-summary(AllSiteModel_LocnoInt_rSite)
+summary(AllSiteModel_site_random)
+ summary(AllSiteModel_LocnoInt_rSite)
 ```
 
 Seems pretty conclusively like neither of our possible formulations (site as a blocking factor without interactions, vs as a random effect) have a significant effect of location. Does this actually make sense with our data?
