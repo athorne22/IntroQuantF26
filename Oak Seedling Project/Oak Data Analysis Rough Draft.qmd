@@ -1,0 +1,131 @@
+---
+title: "Oaks Data Analysis"
+format: html
+editor: visual
+---
+
+## Data Cleaning
+
+**Packages:**
+
+```{r}
+
+library(tidyverse)
+library(readxl)
+```
+
+**Data Files:**
+
+```{r}
+
+Height_Data_Raw <- 
+  read_excel("Oak Data Entry MCRS Field Trip.xlsx", 
+             sheet = "Seedling Heights")
+
+SPAD_Data_Raw <- 
+  read_excel("Oak Data Entry MCRS Field Trip.xlsx", 
+             sheet = "SPAD", 
+             na = "NA")
+
+```
+
+**ANOVA:**
+
+```{r cars}
+
+install.packages("ggpubr")
+install.packages("ggsignif")
+```
+
+```{r}
+
+SPAD_Data_Columns_Clean <- SPAD_Data_Raw |>
+  select(
+    Date, Tag_Num, Treatment, Block, QAQC_Dead_Alive,QAQC_Leaf1, QAQC_Leaf1, QAQC_Leaf2, QAQC_Leaf3, QAQC_Leaf4, QAQC_Leaf5, QAQC_Leaf6, QAQC_Num_leaves
+  ) |>
+  rename_with(
+    ~ str_remove(., "QAQC_")
+  ) |>
+  filter(Dead_Alive == "Alive", Tag_Num != "NA", Tag_Num != "263", Tag_Num != "219", Tag_Num != "159A2") |> # removed outliers
+  separate_wider_regex(
+    cols = Tag_Num,
+    patterns = c(
+      Tag_Number = "^[0-9]+",
+      Sapling_AB     = ".*"      
+    )
+  ) |>
+  mutate(Avg_Leaf_SPAD = rowMeans(across(c(Leaf1, Leaf2, Leaf3, Leaf4, Leaf5, Leaf6)), na.rm = TRUE)
+  ) |>
+  mutate(Date_Factor = as.factor(as_date(Date))
+  )
+
+nrow(SPAD_Data_Columns_Clean) 
+glimpse(SPAD_Data_Columns_Clean)
+
+view(SPAD_Data_Columns_Clean)
+```
+
+SPAD \~ Treatment \* Date_Factor
+
+Visualize:
+
+```{r}
+SPAD_Data_Columns_Clean |>
+  ggplot() +
+  aes(x = Treatment, y = sqrt(Avg_Leaf_SPAD), fill = Date_Factor) +
+  geom_boxplot()
+
+```
+
+Normality
+
+```{r}
+linear_modelSPAD <- lm(sqrt(Avg_Leaf_SPAD) ~ Treatment * Date_Factor, data = SPAD_Data_Columns_Clean)
+
+plot(linear_modelSPAD)
+
+plot(linear_modelSPAD, which = 2)
+
+#results are not great, transforming data
+
+```
+
+```{r}
+SPAD_Data_Columns_Clean |>
+  identify_outliers(Avg_Leaf_SPAD)
+```
+
+Homogeneity of Variance
+
+```{r}
+plot(linear_modelSPAD, which = 1)
+
+SPAD_Data_Columns_Clean |> rstatix::levene_test(Avg_Leaf_SPAD ~ Treatment * Date_Factor)
+```
+
+**Regression:**
+
+```{r}
+
+Height_Data_Columns_Clean <- Height_Data_Raw |>
+  select(Date, Tag_Num, Treatment, Block, Sapling_AB_etc, QAQC_Dead_Alive, QAQC_Seedling_Ht_cm) |>
+  rename_with(~ str_remove(., "QAQC_")) |>
+  rename(Sapling_AB = Sapling_AB_etc, Tag_Number = Tag_Num) |>
+  filter(Dead_Alive == "Alive", Tag_Number != "NA") |>
+  mutate(Date_Factor = as.factor(as_date(Date))
+  )
+
+nrow(Height_Data_Columns_Clean)
+glimpse(Height_Data_Columns_Clean)
+
+view(Height_Data_Columns_Clean)
+```
+
+**Combined:**
+
+```{r}
+
+SPAD_Height <- inner_join(SPAD_Data_Columns_Clean, Height_Data_Columns_Clean) 
+
+view(SPAD_Height)
+```
