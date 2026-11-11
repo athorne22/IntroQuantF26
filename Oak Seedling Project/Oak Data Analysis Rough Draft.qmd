@@ -12,6 +12,7 @@ editor: visual
 
 library(tidyverse)
 library(readxl)
+library(rstatix)
 ```
 
 **Data Files:**
@@ -29,7 +30,7 @@ SPAD_Data_Raw <-
 
 ```
 
-**ANOVA:**
+**Data for ANOVA:**
 
 ```{r cars}
 
@@ -46,7 +47,7 @@ SPAD_Data_Columns_Clean <- SPAD_Data_Raw |>
   rename_with(
     ~ str_remove(., "QAQC_")
   ) |>
-  filter(Dead_Alive == "Alive", Tag_Num != "NA", Tag_Num != "263", Tag_Num != "219", Tag_Num != "159A2") |> # removed outliers
+  filter(Dead_Alive == "Alive", Tag_Num != "NA") |>
   separate_wider_regex(
     cols = Tag_Num,
     patterns = c(
@@ -65,48 +66,9 @@ glimpse(SPAD_Data_Columns_Clean)
 view(SPAD_Data_Columns_Clean)
 ```
 
-SPAD \~ Treatment \* Date_Factor
-
-Visualize:
+**Data for Regression:**
 
 ```{r}
-SPAD_Data_Columns_Clean |>
-  ggplot() +
-  aes(x = Treatment, y = sqrt(Avg_Leaf_SPAD), fill = Date_Factor) +
-  geom_boxplot()
-
-```
-
-Normality
-
-```{r}
-linear_modelSPAD <- lm(sqrt(Avg_Leaf_SPAD) ~ Treatment * Date_Factor, data = SPAD_Data_Columns_Clean)
-
-plot(linear_modelSPAD)
-
-plot(linear_modelSPAD, which = 2)
-
-#results are not great, transforming data
-
-```
-
-```{r}
-SPAD_Data_Columns_Clean |>
-  identify_outliers(Avg_Leaf_SPAD)
-```
-
-Homogeneity of Variance
-
-```{r}
-plot(linear_modelSPAD, which = 1)
-
-SPAD_Data_Columns_Clean |> rstatix::levene_test(Avg_Leaf_SPAD ~ Treatment * Date_Factor)
-```
-
-**Regression:**
-
-```{r}
-
 Height_Data_Columns_Clean <- Height_Data_Raw |>
   select(Date, Tag_Num, Treatment, Block, Sapling_AB_etc, QAQC_Dead_Alive, QAQC_Seedling_Ht_cm) |>
   rename_with(~ str_remove(., "QAQC_")) |>
@@ -121,11 +83,74 @@ glimpse(Height_Data_Columns_Clean)
 view(Height_Data_Columns_Clean)
 ```
 
-**Combined:**
+**Combined Data:**
 
 ```{r}
-
 SPAD_Height <- inner_join(SPAD_Data_Columns_Clean, Height_Data_Columns_Clean) 
 
 view(SPAD_Height)
+```
+
+SPAD \~ Treatment \* Date_Factor
+
+Visualize:
+
+```{r}
+SPAD_Data_Columns_Clean |>
+  ggplot() +
+  aes(x = Treatment, y = Avg_Leaf_SPAD, fill = Date_Factor) +
+  geom_boxplot()
+```
+
+[**Test Assumptions:**]{.underline}
+
+Normality
+
+```{r}
+linear_modelSPAD <- lm(Avg_Leaf_SPAD ~ Treatment * Date_Factor, data = SPAD_Data_Columns_Clean)
+
+plot(linear_modelSPAD)
+
+plot(linear_modelSPAD, which = 2)
+
+#doesn't look great, but will continue further tests 
+
+```
+
+Homogeneity of Variance
+
+```{r}
+
+SPAD_Data_Columns_Clean |> rstatix::levene_test(Avg_Leaf_SPAD ~ Treatment * Date_Factor)
+
+# p-value > 0.05 so it passes the test
+
+```
+
+**Perform the Two-way ANOVA:**
+
+```{r}
+model_SPAD_aov <- aov(Avg_Leaf_SPAD ~ Treatment * Date_Factor, SPAD_Data_Columns_Clean)
+
+summary(model_SPAD_aov)
+
+```
+
+```{r}
+TukeyHSD(model_SPAD_aov)
+```
+
+- no difference between treatments
+
+- significant difference between dates
+
+- [AC differed significantly between dates]{.underline}
+
+```{r}
+SPAD_summary <- SPAD_Data_Columns_Clean |> 
+  group_by(water, plant) |> 
+  summarise(
+    mean = mean(height), 
+    se = sd(height)/ sqrt(length(height)))
+pw_summary
 ```
