@@ -144,13 +144,19 @@ TukeyHSD(model_SPAD_aov)
 
 - significant difference between dates
 
-- [AC differed significantly between dates]{.underline}
+- [SPAD values under adult canopies differed significantly between dates]{.underline}
 
 ```{r}
 SPAD_summary <- SPAD_Data_Columns_Clean |> 
-  group_by(water, plant) |> 
+  group_by(Date_Factor, Treatment) |> 
   summarise(
-    mean = mean(height), 
-    se = sd(height)/ sqrt(length(height)))
-pw_summary
+    mean = mean(Avg_Leaf_SPAD), 
+    se = sd(Avg_Leaf_SPAD)/ sqrt(length(Avg_Leaf_SPAD)))
+SPAD_summary
+
+ggplot(SPAD_summary) + 
+  aes(x = Treatment, y = mean, fill = Date_Factor) + 
+  geom_col(position = "dodge") + 
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), position = position_dodge(0.9), width = 0.2)
+  
 ```
