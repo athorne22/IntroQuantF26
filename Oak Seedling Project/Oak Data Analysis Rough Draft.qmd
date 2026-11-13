@@ -9,10 +9,13 @@ editor: visual
 **Packages:**
 
 ```{r}
-
+install.packages("tidyverse")
+install.packages("rlang")
 library(tidyverse)
 library(readxl)
 library(rstatix)
+
+update.packages(ask = FALSE)
 ```
 
 **Data Files:**
