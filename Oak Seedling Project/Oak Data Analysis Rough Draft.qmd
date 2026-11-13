@@ -1,7 +1,8 @@
 ---
-title: "Oaks Data Analysis"
+title: "Oaks Data Analysis Rough Draft"
 format: html
 editor: visual
+authors: Alex Thorne and Jahat Garcia
 ---
 
 ## Data Cleaning
@@ -9,13 +10,21 @@ editor: visual
 **Packages:**
 
 ```{r}
-install.packages("tidyverse")
 install.packages("rlang")
+install.packages("tidyverse")
+
+library(rlang)
 library(tidyverse)
 library(readxl)
 library(rstatix)
+```
 
-update.packages(ask = FALSE)
+```{r cars}
+
+install.packages("ggpubr")
+install.packages("ggsignif")
+library(ggsignif)
+library(ggpubr)
 ```
 
 **Data Files:**
@@ -35,10 +44,7 @@ SPAD_Data_Raw <-
 
 **Data for ANOVA:**
 
-```{r cars}
-
-install.packages("ggpubr")
-install.packages("ggsignif")
+```{}
 ```
 
 ```{r}
@@ -94,9 +100,11 @@ SPAD_Height <- inner_join(SPAD_Data_Columns_Clean, Height_Data_Columns_Clean)
 view(SPAD_Height)
 ```
 
+## TWO-WAY ANOVA 
+
 SPAD \~ Treatment \* Date_Factor
 
-Visualize:
+### Visualize:
 
 ```{r}
 SPAD_Data_Columns_Clean |>
@@ -105,9 +113,9 @@ SPAD_Data_Columns_Clean |>
   geom_boxplot()
 ```
 
-[**Test Assumptions:**]{.underline}
+### Test Assumptions:
 
-Normality
+[Normality]{.underline}
 
 ```{r}
 linear_modelSPAD <- lm(Avg_Leaf_SPAD ~ Treatment * Date_Factor, data = SPAD_Data_Columns_Clean)
@@ -120,7 +128,7 @@ plot(linear_modelSPAD, which = 2)
 
 ```
 
-Homogeneity of Variance
+[Homogeneity of Variance]{.underline}
 
 ```{r}
 
@@ -130,7 +138,7 @@ SPAD_Data_Columns_Clean |> rstatix::levene_test(Avg_Leaf_SPAD ~ Treatment * Date
 
 ```
 
-**Perform the Two-way ANOVA:**
+### **Perform Two-way ANOVA:**
 
 ```{r}
 model_SPAD_aov <- aov(Avg_Leaf_SPAD ~ Treatment * Date_Factor, SPAD_Data_Columns_Clean)
@@ -138,6 +146,8 @@ model_SPAD_aov <- aov(Avg_Leaf_SPAD ~ Treatment * Date_Factor, SPAD_Data_Columns
 summary(model_SPAD_aov)
 
 ```
+
+### Post-Hoc Test:
 
 ```{r}
 TukeyHSD(model_SPAD_aov)
@@ -149,7 +159,10 @@ TukeyHSD(model_SPAD_aov)
 
 - [SPAD values under adult canopies differed significantly between dates]{.underline}
 
+### Plot
+
 ```{r}
+
 SPAD_summary <- SPAD_Data_Columns_Clean |> 
   group_by(Date_Factor, Treatment) |> 
   summarise(
@@ -160,6 +173,77 @@ SPAD_summary
 ggplot(SPAD_summary) + 
   aes(x = Treatment, y = mean, fill = Date_Factor) + 
   geom_col(position = "dodge") + 
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), position = position_dodge(0.9), width = 0.2)
-  
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), position = position_dodge(0.9), width = 0.2) +
+  geom_signif(
+    y_position = 43,       # position of bar
+    xmin = 0.775,          # Center of the left bar
+    xmax = 1.225,          # Center of the right bar
+    annotations = "*",     
+    tip_length = 0.02,
+    textsize = 5,
+    vjust = 0.4
+  ) +
+  labs(y = "Average SPAD", fill = "Date") +
+  theme_classic()
 ```
+
+The average SPAD values of leaves in seedlings under adult canopies decreased (p = 0.03) between the two sampling dates. Using dates as a proxy for before and after rainfall, this shows that average SPAD decreased after rain in alive seedlings that grew within the adult canopy treatments.
+
+## REGRESSION
+
+### Visualize:
+
+```{r}
+ggplot(SPAD_Height) +
+  aes(x = Avg_Leaf_SPAD, y = Seedling_Ht_cm) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+
+hist(SPAD_Height$Avg_Leaf_SPAD)
+hist(SPAD_Height$Seedling_Ht_cm)
+
+#does not look to be a linear relationship
+
+
+```
+
+### Transform:
+
+```{r}
+SPAD.lm <- lm(Seedling_Ht_cm ~ Avg_Leaf_SPAD, data = SPAD_Height)
+plot(SPAD.lm)
+plot(SPAD.lm, which = 1)
+
+#is not homoscedastic
+
+ggplot(SPAD_Height) +
+  aes(x = log(Avg_Leaf_SPAD), y = Seedling_Ht_cm) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+
+ggplot(SPAD_Height) +
+  aes(x = sqrt(Avg_Leaf_SPAD), y = Seedling_Ht_cm) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+
+# looks as though there is no relationship, could add treatment as a categorical variable but the sample size is not large enough with the combined data that we have
+
+SPAD_H.lm <- lm(Seedling_Ht_cm ~ Avg_Leaf_SPAD, data = SPAD_Height)
+summary(SPAD_H.lm)
+
+SPAD_H_log.lm <- lm(Seedling_Ht_cm ~ log(Avg_Leaf_SPAD), data = SPAD_Height)
+summary(SPAD_H_log.lm)
+
+SPAD_H_sqrt.lm <- lm(Seedling_Ht_cm ~ sqrt(Avg_Leaf_SPAD), data = SPAD_Height)
+summary(SPAD_H_sqrt.lm)
+
+#R-squared value is negative
+
+#try a parabolic relationship, r-squared is lower
+
+SPAD_H_I.lm <- lm(Seedling_Ht_cm ~ Avg_Leaf_SPAD + I(Avg_Leaf_SPAD^2), data = SPAD_Height)
+summary(SPAD_H_I.lm)
+
+```
+
+There is no observable pattern between average leaf SPAD values and seedling height.
