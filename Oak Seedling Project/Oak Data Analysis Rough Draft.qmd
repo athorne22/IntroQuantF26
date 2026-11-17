@@ -44,7 +44,7 @@ SPAD_Data_Raw <-
 
 **Data for ANOVA:**
 
-```{}
+```         
 ```
 
 ```{r}
@@ -100,7 +100,7 @@ SPAD_Height <- inner_join(SPAD_Data_Columns_Clean, Height_Data_Columns_Clean)
 view(SPAD_Height)
 ```
 
-## TWO-WAY ANOVA 
+## TWO-WAY ANOVA
 
 SPAD \~ Treatment \* Date_Factor
 
