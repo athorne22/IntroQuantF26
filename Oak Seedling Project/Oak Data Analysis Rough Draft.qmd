@@ -44,9 +44,6 @@ SPAD_Data_Raw <-
 
 **Data for ANOVA:**
 
-```         
-```
-
 ```{r}
 
 SPAD_Data_Columns_Clean <- SPAD_Data_Raw |>
@@ -125,6 +122,8 @@ plot(linear_modelSPAD)
 plot(linear_modelSPAD, which = 2)
 
 #doesn't look great, but will continue further tests 
+
+#add block factor 
 
 ```
 
