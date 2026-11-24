@@ -17,6 +17,8 @@ library(rlang)
 library(tidyverse)
 library(readxl)
 library(rstatix)
+
+citation("ggsignif")
 ```
 
 ```{r cars}
@@ -53,7 +55,7 @@ SPAD_Data_Columns_Clean <- SPAD_Data_Raw |>
   rename_with(
     ~ str_remove(., "QAQC_")
   ) |>
-  filter(Dead_Alive == "Alive", Tag_Num != "NA") |>
+  filter(Dead_Alive == "Alive") |>
   separate_wider_regex(
     cols = Tag_Num,
     patterns = c(
@@ -79,9 +81,11 @@ Height_Data_Columns_Clean <- Height_Data_Raw |>
   select(Date, Tag_Num, Treatment, Block, Sapling_AB_etc, QAQC_Dead_Alive, QAQC_Seedling_Ht_cm) |>
   rename_with(~ str_remove(., "QAQC_")) |>
   rename(Sapling_AB = Sapling_AB_etc, Tag_Number = Tag_Num) |>
-  filter(Dead_Alive == "Alive", Tag_Number != "NA") |>
+  filter(Dead_Alive == "Alive") |>
   mutate(Date_Factor = as.factor(as_date(Date))
   )
+
+Height_Data_Columns_Clean$Treatment[Height_Data_Columns_Clean$Treatment == "OA"] <- "OS"
 
 nrow(Height_Data_Columns_Clean)
 glimpse(Height_Data_Columns_Clean)
@@ -107,6 +111,7 @@ SPAD \~ Treatment \* Date_Factor
 SPAD_Data_Columns_Clean |>
   ggplot() +
   aes(x = Treatment, y = Avg_Leaf_SPAD, fill = Date_Factor) +
+  facet_wrap(~Block) +
   geom_boxplot()
 ```
 
@@ -115,7 +120,7 @@ SPAD_Data_Columns_Clean |>
 [Normality]{.underline}
 
 ```{r}
-linear_modelSPAD <- lm(Avg_Leaf_SPAD ~ Treatment * Date_Factor, data = SPAD_Data_Columns_Clean)
+linear_modelSPAD <- lm(Avg_Leaf_SPAD ~ Treatment * Date_Factor + Block, data = SPAD_Data_Columns_Clean)
 
 plot(linear_modelSPAD)
 
@@ -140,7 +145,7 @@ SPAD_Data_Columns_Clean |> rstatix::levene_test(Avg_Leaf_SPAD ~ Treatment * Date
 ### **Perform Two-way ANOVA:**
 
 ```{r}
-model_SPAD_aov <- aov(Avg_Leaf_SPAD ~ Treatment * Date_Factor, SPAD_Data_Columns_Clean)
+model_SPAD_aov <- aov(Avg_Leaf_SPAD ~ Treatment * Date_Factor + Block, SPAD_Data_Columns_Clean)
 
 summary(model_SPAD_aov)
 
@@ -170,23 +175,13 @@ SPAD_summary <- SPAD_Data_Columns_Clean |>
 SPAD_summary
 
 ggplot(SPAD_summary) + 
-  aes(x = Treatment, y = mean, fill = Date_Factor) + 
+  aes(x = Date_Factor, y = mean, fill = Treatment) + 
   geom_col(position = "dodge") + 
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), position = position_dodge(0.9), width = 0.2) +
-  geom_signif(
-    y_position = 43,       # position of bar
-    xmin = 0.775,          # Center of the left bar
-    xmax = 1.225,          # Center of the right bar
-    annotations = "*",     
-    tip_length = 0.02,
-    textsize = 5,
-    vjust = 0.4
-  ) +
-  labs(y = "Average SPAD", fill = "Date") +
+ 
+  labs(y = "Average SPAD", fill = "Treatment") +
   theme_classic()
 ```
-
-The average SPAD values of leaves in seedlings under adult canopies decreased (p = 0.03) between the two sampling dates. Using dates as a proxy for before and after rainfall, this shows that average SPAD decreased after rain in alive seedlings that grew within the adult canopy treatments.
 
 ## REGRESSION
 
@@ -202,6 +197,7 @@ hist(SPAD_Height$Avg_Leaf_SPAD)
 hist(SPAD_Height$Seedling_Ht_cm)
 
 #does not look to be a linear relationship
+
 
 
 ```

@@ -10,21 +10,14 @@ authors: Alex Thorne
 **Packages:**
 
 ```{r}
-install.packages("rlang")
-install.packages("tidyverse")
-
+#install.packages("rlang")
+#install.packages("tidyverse")
+#install.packages("ggpubr")
+#install.packages("ggsignif")
 library(rlang)
 library(tidyverse)
 library(readxl)
 library(rstatix)
-
-citation("ggsignif")
-```
-
-```{r cars}
-
-install.packages("ggpubr")
-install.packages("ggsignif")
 library(ggsignif)
 library(ggpubr)
 ```
@@ -244,7 +237,7 @@ summary(SPAD_H_I.lm)
 There is no observable pattern between average leaf SPAD values and seedling height.
 
 ```{r}
-write.csv(SPAD_Data_Columns_Clean, "ANOVAData", row.names = FALSE)
-write.csv(SPAD_Height, "CombinedRegressionData", row.names = FALSE)
+write.csv(SPAD_Data_Columns_Clean, "ANOVAData.csv", row.names = FALSE)
+write.csv(SPAD_Height, "CombinedRegressionData.csv", row.names = FALSE)
 
 ```
